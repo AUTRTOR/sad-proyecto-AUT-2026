@@ -11,9 +11,9 @@ seguridad de una PYME.
 Actúa como router central, cortafuegos (iptables/nftables) y nodo VPN. Separa fisicamente (mediante redes internas
 de VirtualBox) todas las subredes.
 
-* SO: Ubuntu 24.04
-* Hostname: `gw-aut`
-* Interfaces de red:
+* **SO**: Ubuntu 24.04
+* **Hostname**: `gw-aut`
+* **Interfaces de red**:
     * `eth0` (NAT): Salida a Internet básica (Vagrant por defecto).
 
      * `eth1` (Bridge): Conexión puente a la red física del aula (para Site-to-Site VPN). IP asignada por el instituto.
@@ -25,49 +25,49 @@ de VirtualBox) todas las subredes.
 
 Red para los servidores críticos internos y la administración. No tiene acceso directo desde Internet. Salida a Internet enrutada por el `gw`.
 
-* Proveedor de Identidades (`idp`)
-    * SO: Ubuntu 24.04
-    * Hostname: `idp-aut`
-    * IP: `172.3.9.2`
-    * Rol: Servidor OpenLDAP
+* **Proveedor de Identidades (`idp`)**
+    * **SO**: Ubuntu 24.04
+    * **Hostname**: `idp-aut`
+    * **IP**: `172.3.9.2`
+    * **Rol**: Servidor OpenLDAP
 
-* Servidor de Backups (`backup-srv`)
-    * SO: Alpine Linux
-    * Hostname: `backup-srv-aut`
-    * IP: `172.3.9.20`
-    * Rol: Tira de `pull` de los datos (mediante `rsync` y `cron`) de los demás servidores hacia su almacenamiento local de forma segura.
+* **Servidor de Backups** (`backup-srv`)
+    * **SO**: Alpine Linux
+    * **Hostname**: `backup-srv-aut`
+    * **IP**: `172.3.9.20`
+    * **Rol**: Tira de `pull` de los datos (mediante `rsync` y `cron`) de los demás servidores hacia su almacenamiento local de forma segura.
 
 ### 3. LAN de Empleados (172.2.9.0/24)
 
 Red de usuarios estándar. Navegación restringida a través del proxy.
 
-* Equipo de Administración (`adminpc`)
-    * SO: Alpine Linux
-    * Hostname: `adminpc-aut`
-    * IP: `172.2.9.10`
-    * Rol: Máquina de salto y gestión. Desde aquí el administrador despliega scripts, se conecta por SSH a los demás equipos usando claves, etc.
+* **Equipo de Administración** (`adminpc`)
+    * **SO**: Alpine Linux
+    * **Hostname**: `adminpc-aut`
+    * **IP**: `172.2.9.10`
+    * **Rol**: Máquina de salto y gestión. Desde aquí el administrador despliega scripts, se conecta por SSH a los demás equipos usando claves, etc.
 
-* Equipo Empleado (`empleado`)
-    * SO: Alpine Linux
-    * Hostname: `empleadopc-aut`
-    * IP: `172.2.9.100`
-    * Rol: Simula a un empleado de la PYME.
+* **Equipo Empleado** (`empleado`)
+    * **SO**: Alpine Linux
+    * **Hostname**: `empleadopc-aut`
+    * **IP**: `172.2.9.100`
+    * **Rol**: Simula a un empleado de la PYME.
 
 ### 4. DMZ - Zona Desmilitarizada (172.1.9.0/24)
 
 Servicios expuestos o que intermedian con el exterior.
 
-* Servidor Proxy (`proxy`)
-    * SO: Ubuntu 24.04
-    * Hostname: `proxy-aut`
-    * IP: `172.1.9.2`
-    * Rol: Proxy web (Squid) para filtrar tráfico de los empleados.
+* **Servidor Proxy** (`proxy`)
+    * **SO**: Ubuntu 24.04
+    * **Hostname**: `proxy-aut`
+    * **IP**: `172.1.9.2`
+    * **Rol**: Proxy web (Squid) para filtrar tráfico de los empleados.
 
-* Servidor Web (`www`)
-    * SO: Alpine Linux
-    * Hostname: `www-aut`
-    * IP: `172.1.9.3`
-    * Rol: Aloja los servicios web expuestos de la PYME y DVWA para las prácticas de Pentesting (Red Team).
+* **Servidor Web** (`www`)
+    * **SO**: Alpine Linux
+    * **Hostname**: `www-aut`
+    * **IP**: `172.1.9.3`
+    * **Rol**: Aloja los servicios web expuestos de la PYME y DVWA para las prácticas de Pentesting (Red Team).
 
 ## 2. Instrucciones para el despliegue
 
