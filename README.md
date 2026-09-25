@@ -1,102 +1,67 @@
 # Proyecto SAD
-Nuestro proyecto de prueba para el módulo de Seguridad y Alta Disponibilidad de 2° de ASIR para simular la infraestructura y
-seguridad de una PYME.
 
-## 1. Estructura
+Este proyecto es para el módulo de Seguridad y Alta Disponibilidad (SAD) de 2º de ASIR. Básicamente, consiste en montar una pequeña red de empresa usando máquinas virtuales con VirtualBox y Vagrant, y probar diferentes medidas de seguridad.
 
-![](rde.png)
+## 1. Estructura de la red
 
-### 1. Gateway y Enrutador (gw)
+La red está dividida en varias partes para tener los equipos y servidores separados.
 
-Actúa como router central, cortafuegos (iptables/nftables) y nodo VPN. Separa fisicamente (mediante redes internas
-de VirtualBox) todas las subredes.
+### Gateway y router (gw)
 
-* **SO**: Ubuntu 24.04
-* **Hostname**: `gw-aut`
-* **Interfaces de red**:
-    * `eth0` (NAT): Salida a Internet básica (Vagrant por defecto).
+Es el equipo principal de la red. Utiliza Ubuntu 24.04 y se encarga de conectar las diferentes redes entre sí, además de controlar el tráfico y hacer de firewall y VPN
 
-     * `eth1` (Bridge): Conexión puente a la red física del aula (para Site-to-Site VPN). IP asignada por el instituto.
-     * `eth2` (DMZ): `172.1.9.1`
-    * `eth3` (Empleados): `172.2.9.1`
-    * `eth4` (Gestión): `172.3.9.1`
+### Red de Gestión e Intranet
 
-### 2. LAN de Gestión/Intranet (172.3.9.0/24)
+Es la red donde están los servidores internos de la empresa.
 
-Red para los servidores críticos internos y la administración. No tiene acceso directo desde Internet. Salida a Internet enrutada por el `gw`.
+- **idp:** servidor Ubuntu con OpenLDAP para gestionar usuarios.
+- **backup-srv:** servidor Alpine encargado de realizar copias de seguridad de los demás servidores mediante `rsync` y `cron`.
 
-* **Proveedor de Identidades (`idp`)**
-    * **SO**: Ubuntu 24.04
-    * **Hostname**: `idp-aut`
-    * **IP**: `172.3.9.2`
-    * **Rol**: Servidor OpenLDAP
+### Red de Empleados
 
-* **Servidor de Backups** (`backup-srv`)
-    * **SO**: Alpine Linux
-    * **Hostname**: `backup-srv-aut`
-    * **IP**: `172.3.9.20`
-    * **Rol**: Tira de `pull` de los datos (mediante `rsync` y `cron`) de los demás servidores hacia su almacenamiento local de forma segura.
+Es la red donde están los ordenadores de los trabajadores.
 
-### 3. LAN de Empleados (172.2.9.0/24)
+- **adminpc:** equipo utilizado por el administrador para gestionar el resto de máquinas mediante SSH y scripts.
+- **empleado:** equipo que simula el ordenador de un trabajador normal.
 
-Red de usuarios estándar. Navegación restringida a través del proxy.
+La navegación de los empleados está controlada mediante el proxy.
 
-* **Equipo de Administración** (`adminpc`)
-    * **SO**: Alpine Linux
-    * **Hostname**: `adminpc-aut`
-    * **IP**: `172.2.9.10`
-    * **Rol**: Máquina de salto y gestión. Desde aquí el administrador despliega scripts, se conecta por SSH a los demás equipos usando claves, etc.
+### DMZ
 
-* **Equipo Empleado** (`empleado`)
-    * **SO**: Alpine Linux
-    * **Hostname**: `empleadopc-aut`
-    * **IP**: `172.2.9.100`
-    * **Rol**: Simula a un empleado de la PYME.
+En la DMZ están los servicios que tienen que estar más accesibles desde el exterior.
 
-### 4. DMZ - Zona Desmilitarizada (172.1.9.0/24)
+- **proxy:** servidor Ubuntu con Squid que controla y filtra la navegación de los empleados.
+- **www:** servidor Alpine que aloja la página web de la empresa y DVWA, utilizado para realizar prácticas de Pentesting.
 
-Servicios expuestos o que intermedian con el exterior.
+## 2. Despliegue del proyecto
 
-* **Servidor Proxy** (`proxy`)
-    * **SO**: Ubuntu 24.04
-    * **Hostname**: `proxy-aut`
-    * **IP**: `172.1.9.2`
-    * **Rol**: Proxy web (Squid) para filtrar tráfico de los empleados.
+Para poder utilizar el proyecto necesitamos tener instalados:
 
-* **Servidor Web** (`www`)
-    * **SO**: Alpine Linux
-    * **Hostname**: `www-aut`
-    * **IP**: `172.1.9.3`
-    * **Rol**: Aloja los servicios web expuestos de la PYME y DVWA para las prácticas de Pentesting (Red Team).
+- Git
+- VirtualBox
+- Vagrant
 
-## 2. Instrucciones para el despliegue
-
-### 2.1. Requisitos previos
-
-Tener instalado lo siguiente:
-
-* Git
-* VirtualBox
-* Vagrant
-
-### 2.2. Despliegue
-
-1. Clonar este repositorio
+Primero clonamos el repositorio:
 
 ```bash
-$ git clone https://github.com/AUTRTOR/sad-proyecto-AUT-2026.git
+git clone https://github.com/AUTRTOR/sad-proyecto-AUT-2026.git
 ```
 
-2. Levantar con vagrant
+Entramos en la carpeta y levantamos todas las máquinas virtuales:
+
 ```bash
-$ cd SAD-PROYECTO-2026-26-solucion
-$ vagrant up
+cd SAD
+vagrant up
 ```
-3. Una vez levantado comprobamos el estado de las máquinas con
+
+Cuando termine, podemos comprobar que las máquinas están funcionando correctamente con:
+
 ```bash
-$ vagrant status
+vagrant status
 ```
-4. Y accedemos a las máquinas con `vagrant ssh maquina`. Ej. para acceder a www:
+
+Por último, podemos acceder a cualquier máquina mediante SSH usando Vagrant. Por ejemplo, para entrar en el servidor web:
+
 ```bash
-$ vagrant ssh www
+vagrant ssh www
 ```
