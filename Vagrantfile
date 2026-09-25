@@ -23,7 +23,7 @@ Vagrant.configure("2") do |config|
         vb.memory = "768"
         vb.cpus = 1
         vb.linked_clone = true
-        vb.customize ["modifyvm", :id, "--groups", "/sad"]
+      #  vb.customize ["modifyvm", :id, "--groups", "/sad"]
     end
   end        
   
