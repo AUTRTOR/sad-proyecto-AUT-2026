@@ -75,7 +75,7 @@ Vagrant.configure("2") do |config|
 
   # Empleado en la LAN
   config.vm.define "empleado" do |empleado|
-    empleado.vm.box = "generic/alpine319"
+    empleado.vm.box = "bento/ubuntu-24.04"
     empleado.vm.hostname = "empleado-#{iniciales}"
     empleado.vm.network "private_network", ip: "172.2.#{N}.100", netmask: "255.255.255.0", virtualbox__intnet: "red_lan"
     empleado.vm.provision "shell", path: "empleado/provision.sh"
@@ -86,7 +86,7 @@ Vagrant.configure("2") do |config|
     empleado.vm.provider "virtualbox" do |vb|
         vb.name = "empleado-lan"
         vb.gui = false
-        vb.memory = "128"
+        vb.memory = "512"
         vb.cpus = 1
         vb.linked_clone = true
         vb.customize ["modifyvm", :id, "--groups", "/sad"]

@@ -29,3 +29,6 @@ chown -R admin_AUT:admin_AUT /home/admin_AUT/.ssh
 chmod 700 /home/admin_AUT/.ssh
 chmod 600 /home/admin_AUT/.ssh/id_ed25519
 chmod 644 /home/admin_AUT/.ssh/id_ed25519.pub
+
+apt-get update
+apt-get install -y curl nmap
