@@ -81,4 +81,23 @@ rc-update add php-fpm81 default
 rc-service php-fpm81 restart
 rc-service nginx restart
 
+set -e
+
+echo "=> Configurando bastionado SSH en WWW..."
+apk add sudo
+adduser -D admin_AUT
+passwd -u admin_AUT
+adduser admin_AUT wheel
+echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
+
+mkdir -p /home/admin_AUT/.ssh
+cat /tmp/id_ed25519.pub >> /home/admin_AUT/.ssh/authorized_keys
+chown -R admin_AUT:admin_AUT /home/admin_AUT/.ssh
+chmod 700 /home/admin_AUT/.ssh
+chmod 600 /home/admin_AUT/.ssh/authorized_keys
+
+sed -i 's/^.*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+sed -i 's/^.*PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+rc-service sshd restart
+
 echo "------ FIN ------"
