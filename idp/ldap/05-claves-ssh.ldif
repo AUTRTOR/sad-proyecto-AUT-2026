@@ -1,0 +1,7 @@
+dn: uid=usuario.aut,ou=usuarios,dc=aut,dc=internal
+changetype: modify
+add: objectClass
+objectClass: ldapPublicKey
+-
+add: sshPublicKey
+sshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC5w/BXGZPtqltkTSRL0ncvuBDQc8u704WLpWXDCGT2y admin_AUT@adminpc
