@@ -8,3 +8,5 @@ Thumbs.db
 *~
 .env
 .adminpc/claves-ssh
+idp/tls/idp.key
+idp/ca/
