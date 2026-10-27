@@ -57,7 +57,6 @@ Vagrant.configure("2") do |config|
     adminpc.vm.provision "file", source: "adminpc/claves-ssh/clave_admin_privada", destination: "/tmp/id_ed25519"
     adminpc.vm.provision "file", source: "adminpc/claves-ssh/clave_admin.pub", destination: "/tmp/id_ed25519.pub"
 
-
     adminpc.vm.provision "shell", path: "adminpc/provision.sh"
     # eliminar default gw en eth0 – red NAT creada por defecto
     adminpc.vm.provision "shell",
@@ -79,10 +78,10 @@ Vagrant.configure("2") do |config|
     empleado.vm.hostname = "empleado-#{iniciales}"
     empleado.vm.network "private_network", ip: "172.2.#{N}.100", netmask: "255.255.255.0", virtualbox__intnet: "red_lan"
     empleado.vm.provision "shell", path: "empleado/provision.sh"
-    # eliminar default gw en eth0 – red NAT creada por defecto
+    # eliminar default gw en eth0 y reiniciar SSSD tras fijar ruta
     empleado.vm.provision "shell",
         run: "always",
-        inline:  "ip route replace default via 172.2.#{N}.1"   
+        inline:  "ip route replace default via 172.2.#{N}.1; systemctl try-restart sssd || true"   
     empleado.vm.provider "virtualbox" do |vb|
         vb.name = "empleado-lan"
         vb.gui = false
@@ -122,10 +121,10 @@ Vagrant.configure("2") do |config|
     www.vm.provision "file", source: "adminpc/claves-ssh/clave_admin.pub", destination: "/tmp/id_ed25519.pub"
     
     www.vm.provision "shell", path: "www/provision.sh"
-    # eliminar default gw en eth0 – red NAT creada por defecto
+    # eliminar default gw en eth0 y reiniciar SSSD tras fijar ruta
     www.vm.provision "shell",
         run: "always",
-        inline:  "ip route replace default via 172.1.#{N}.1"     
+        inline:  "ip route replace default via 172.1.#{N}.1; systemctl try-restart sssd || true"     
     www.vm.provider "virtualbox" do |vb|
         vb.name = "www-dmz"
         vb.gui = false
