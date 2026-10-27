@@ -1,0 +1,27 @@
+dn: uid=usuario.aut,ou=usuarios,dc=aut,dc=internal
+objectClass: inetOrgPerson
+objectClass: posixAccount
+uid: usuario.aut
+cn: Antonio
+sn: Utrera
+givenName: AUT
+mail: usuario.aut@aut.internal
+uidNumber: 10001
+gidNumber: 10000
+homeDirectory: /home/usuario.aut
+loginShell: /bin/bash
+userPassword: {SSHA}bzZ6iQ2GLnuU3LWIrxm+AdnL+sSYQnJE
+
+dn: uid=luis.martin,ou=usuarios,dc=aut,dc=internal
+objectClass: inetOrgPerson
+objectClass: posixAccount
+uid: luis.martin
+cn: Luis Martín
+sn: Martín
+givenName: Luis
+mail: luis.martin@aut.internal
+uidNumber: 10002
+gidNumber: 10000
+homeDirectory: /home/luis.martin
+loginShell: /bin/bash
+userPassword: {SSHA}NGj1ubRBA60qlanuHzh6P8r0qXLTJjmi

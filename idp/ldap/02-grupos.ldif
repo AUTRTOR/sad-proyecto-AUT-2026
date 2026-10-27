@@ -1,0 +1,12 @@
+dn: cn=empleados,ou=grupos,dc=aut,dc=internal
+objectClass: posixGroup
+cn: empleados
+gidNumber: 10000
+memberUid: usuario.aut
+memberUid: luis.martin
+
+dn: cn=admins,ou=grupos,dc=aut,dc=internal
+objectClass: posixGroup
+cn: admins
+gidNumber: 10001
+memberUid: usuario.aut
