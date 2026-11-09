@@ -4,16 +4,20 @@ export DEBIAN_FRONTEND=noninteractive
 echo "########################################"
 echo "Aprovisionando WWW"
 echo "########################################"
+
+# 1. Actualización e instalación de paquetes
 apt-get update -y
 apt-get install -y nginx openssl php-fpm php-opcache php-gd php-mysql php-curl
 PHPV=$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')
 
+# 2. Certificado autofirmado
 mkdir -p /etc/ssl/private /etc/ssl/certs
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
   -keyout /etc/ssl/private/nginx-selfsigned.key \
   -out /etc/ssl/certs/nginx-selfsigned.crt \
   -subj "/C=ES/ST=Almeria/L=Almeria/O=IES_CELIA_VINAS/OU=IT/CN=localhost"
 
+# 3. Configuración de Nginx y PHP
 rm -f /etc/nginx/sites-enabled/default
 cat <<'NGINX' > /etc/nginx/sites-available/servidor_web
 server {
@@ -58,6 +62,7 @@ nginx -t
 systemctl enable php$PHPV-fpm nginx
 systemctl restart php$PHPV-fpm nginx
 
+# 4. Cuenta de emergencia (admin_AUT) y bastionado SSH
 echo "=> Blindando acceso SSH en www... "
 id admin_AUT >/dev/null 2>&1 || useradd -m -s /bin/bash admin_AUT
 usermod -aG sudo admin_AUT
@@ -71,11 +76,25 @@ cat > /etc/ssh/sshd_config.d/00-bastionado.conf <<'EOF'
 PermitRootLogin no
 PasswordAuthentication no
 EOF
+
+# 5. Acceso SSH y sudo para los administradores de LDAP
+echo "=> Acceso de los administradores de LDAP..."
+cat > /etc/ssh/sshd_config.d/10-ldap.conf <<'SSHD'
+AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys
+AuthorizedKeysCommandUser nobody
+SSHD
+
+echo "%admins ALL=(ALL:ALL) ALL" > /etc/sudoers.d/admins
+chmod 440 /etc/sudoers.d/admins
+visudo -c
+
 sshd -t
 systemctl restart ssh
 
+# 6. Evitar que dhcpcd ponga puerta de enlace en eth0
 grep -q '^interface eth0' /etc/dhcpcd.conf || cat >> /etc/dhcpcd.conf <<'EOF'
 interface eth0
 nogateway
 EOF
+
 echo "------ FIN ------"

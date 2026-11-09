@@ -1,6 +1,24 @@
 N = "9" # Tu número de clase
 iniciales = "AUT"
 
+# Lector de .env con limpieza de BOM UTF-8 de Windows y fallback
+secretos = {}
+fichero_env = File.exist?(".env") ? ".env" : (File.exist?(".env.txt") ? ".env.txt" : nil)
+
+if fichero_env
+  File.readlines(fichero_env, encoding: "BOM|UTF-8:UTF-8").each do |linea|
+    linea = linea.strip
+    next if linea.empty? || linea.start_with?("#")
+    clave, valor = linea.split("=", 2)
+    if clave && valor
+      secretos[clave.strip] = valor.strip.gsub(/^["']|["']$/, '')
+    end
+  end
+end
+
+# Valor de respaldo si no detecta la variable en el fichero
+secretos["LDAP_ADMIN_PASS"] ||= "Admin123456!"
+
 Vagrant.configure("2") do |config|
 
   # Definición del equipo gw
@@ -33,6 +51,13 @@ Vagrant.configure("2") do |config|
     idp.vm.box = "bento/ubuntu-24.04"
     idp.vm.hostname = "idp-#{iniciales}"
     idp.vm.network "private_network", ip: "172.3.#{N}.2", netmask: "255.255.255.0", virtualbox__intnet: "red_gestion"
+
+    idp.vm.provision "shell", path: "idp/provision.sh", env: {
+      "DOMINIO" => "#{iniciales}.internal",
+      "ORGANIZACION" => "Empresa #{iniciales}",
+      "LDAP_ADMIN_PASS" => secretos["LDAP_ADMIN_PASS"]
+    }
+
     idp.vm.provision "shell", path: "idp/provision.sh"
     # eliminar default gw en eth0 – red NAT creada por defecto
     idp.vm.provision "shell",
@@ -112,7 +137,7 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  # WWW en DMZ
+ # WWW en DMZ
   config.vm.define "www" do |www|
     www.vm.box = "bento/debian-13"
     www.vm.hostname = "www-#{iniciales}"
@@ -121,6 +146,8 @@ Vagrant.configure("2") do |config|
     www.vm.provision "file", source: "adminpc/claves-ssh/clave_admin.pub", destination: "/tmp/id_ed25519.pub"
     
     www.vm.provision "shell", path: "www/provision.sh"
+    www.vm.provision "shell", path: "comun/cliente-ldap.sh", args: ["www"]
+
     # eliminar default gw en eth0 y reiniciar SSSD tras fijar ruta
     www.vm.provision "shell",
         run: "always",

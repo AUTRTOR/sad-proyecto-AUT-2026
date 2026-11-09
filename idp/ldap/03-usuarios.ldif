@@ -10,7 +10,7 @@ uidNumber: 10001
 gidNumber: 10000
 homeDirectory: /home/usuario.aut
 loginShell: /bin/bash
-userPassword: {SSHA}bzZ6iQ2GLnuU3LWIrxm+AdnL+sSYQnJE
+userPassword: {SSHA}Z9VW2OTqUvCbUCN7oQMeqfZIw7ax2ago
 
 dn: uid=luis.martin,ou=usuarios,dc=aut,dc=internal
 objectClass: inetOrgPerson
@@ -24,4 +24,4 @@ uidNumber: 10002
 gidNumber: 10000
 homeDirectory: /home/luis.martin
 loginShell: /bin/bash
-userPassword: {SSHA}NGj1ubRBA60qlanuHzh6P8r0qXLTJjmi
+userPassword: {SSHA}ZLckmSRaEdnCXiZmJNF/aDX87KxQcXXm
