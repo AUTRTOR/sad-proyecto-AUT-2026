@@ -7,7 +7,6 @@ Thumbs.db
 *.swp
 *~
 .env
-.env.ejemplo
 .adminpc/claves-ssh
 idp/tls/idp.key
 idp/ca/
