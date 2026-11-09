@@ -20,11 +20,20 @@ chmod 440 /etc/sudoers.d/admin_AUT
 # Claves SSH inyectadas por Vagrant en /tmp
 echo "=> Importamos claves SSH"
 mkdir -p /home/admin_AUT/.ssh
-cp /tmp/id_ed25519 /home/admin_AUT/.ssh/id_ed25519
-cp /tmp/id_ed25519.pub /home/admin_AUT/.ssh/id_ed25519.pub
 
-# Por si las claves vienen de Windows con finales de línea CRLF (¡Corregido en una sola línea!)
+# 1. Convertir de UTF-16LE a UTF-8 si viene en formato ancho desde Windows
+if file /tmp/id_ed25519 | grep -q "UTF-16"; then
+    iconv -f UTF-16LE -t UTF-8 /tmp/id_ed25519 > /home/admin_AUT/.ssh/id_ed25519
+    iconv -f UTF-16LE -t UTF-8 /tmp/id_ed25519.pub > /home/admin_AUT/.ssh/id_ed25519.pub
+else
+    cp /tmp/id_ed25519 /home/admin_AUT/.ssh/id_ed25519
+    cp /tmp/id_ed25519.pub /home/admin_AUT/.ssh/id_ed25519.pub
+fi
+
+# 2. Eliminar finales de línea CRLF (\r)
 sed -i 's/\r$//' /home/admin_AUT/.ssh/id_ed25519 /home/admin_AUT/.ssh/id_ed25519.pub
+# 3. Eliminar la marca BOM (UTF-8 con BOM que añade Windows y rompe libcrypto)
+sed -i '1s/^\xef\xbb\xbf//' /home/admin_AUT/.ssh/id_ed25519 /home/admin_AUT/.ssh/id_ed25519.pub
 
 chown -R admin_AUT:admin_AUT /home/admin_AUT/.ssh
 chmod 700 /home/admin_AUT/.ssh

@@ -96,17 +96,22 @@ Vagrant.configure("2") do |config|
         vb.customize ["modifyvm", :id, "--groups", "/sad"]
     end
   end
-
-  # Empleado en la LAN
+  
+# Empleado en la LAN
   config.vm.define "empleado" do |empleado|
     empleado.vm.box = "bento/debian-13"
     empleado.vm.hostname = "empleado-#{iniciales}"
     empleado.vm.network "private_network", ip: "172.2.#{N}.100", netmask: "255.255.255.0", virtualbox__intnet: "red_lan"
+    
     empleado.vm.provision "shell", path: "empleado/provision.sh"
+    # ESTA ES LA LÍNEA QUE FALTABA:
+    empleado.vm.provision "shell", path: "comun/cliente-ldap.sh", args: ["empleado"]
+
     # eliminar default gw en eth0 y reiniciar SSSD tras fijar ruta
     empleado.vm.provision "shell",
         run: "always",
         inline:  "ip route replace default via 172.2.#{N}.1; systemctl try-restart sssd || true"   
+    
     empleado.vm.provider "virtualbox" do |vb|
         vb.name = "empleado-lan"
         vb.gui = false
